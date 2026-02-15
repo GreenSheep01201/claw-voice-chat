@@ -120,6 +120,7 @@ class VoiceSession:
         if msg_type == "flush":
             await self._send({"type": "info", "message": "flush requested"})
             await self._stt.flush()
+            await self._send({"type": "flush_complete"})
             return
 
         if msg_type == "text":

@@ -702,6 +702,16 @@ export default function App() {
           if (typeof (msg as any).audio === 'string') enqueueAudio((msg as any).audio)
         }
         break
+      case 'flush_complete': {
+        // Backend finished processing flush — drain accumulated STT and inject as one message.
+        const parts = sttAccumulatorRef.current
+        sttAccumulatorRef.current = []
+        if (parts.length > 0) {
+          const combined = parts.join(' ')
+          void injectToTarget(combined)
+        }
+        break
+      }
       default:
         break
     }
@@ -903,18 +913,7 @@ export default function App() {
     setMicLevel(0)
 
     sendJson({ type: 'flush' })
-
-    // Flush accumulated STT finals as a single message to the channel.
-    // Use a short delay to let the backend process the flush and emit any remaining stt_final.
-    setTimeout(() => {
-      const parts = sttAccumulatorRef.current
-      sttAccumulatorRef.current = []
-      if (parts.length > 0) {
-        const combined = parts.join(' ')
-        void injectToTarget(combined)
-      }
-    }, 500)
-
+    // Accumulated STT will be flushed on 'flush_complete' from backend.
     addMeta('Mic streaming stopped')
   }
 
