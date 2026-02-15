@@ -1,8 +1,71 @@
-# Claw-Voice-Chat
+<p align="center">
+  <img src="client/public/claw-icon.svg" width="80" alt="Claw Voice Chat" />
+</p>
 
-Push-to-talk voice chat interface for [OpenClaw](https://github.com/openclaw/openclaw) channels.
+<h1 align="center">Claw-Voice-Chat</h1>
 
-Connect to Telegram, Discord, Slack, or any OpenClaw channel and interact using voice or text. Messages are transcribed via STT, sent to the selected channel's AI agent, and responses stream back in real-time with configurable TTS playback.
+<p align="center">
+  <strong>Push-to-Talk Voice Chat for OpenClaw Channels</strong><br>
+  Connect to Telegram, Discord, Slack, or any <a href="https://github.com/openclaw/openclaw">OpenClaw</a> channel and interact using voice or text.<br>
+  Messages are transcribed via STT, sent to the AI agent, and responses stream back with configurable TTS.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/node-%3E%3D22-brightgreen" alt="Node.js 22+" />
+  <img src="https://img.shields.io/badge/python-%3E%3D3.10-blue" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/license-Apache%202.0-orange" alt="License" />
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform" />
+  <img src="https://img.shields.io/badge/STT-faster--whisper-blueviolet" alt="STT" />
+  <img src="https://img.shields.io/badge/TTS-Browser%20%7C%20OpenAI%20%7C%20edge--tts-blueviolet" alt="TTS" />
+</p>
+
+<p align="center">
+  <a href="#install-with-ai">Install with AI</a> &middot;
+  <a href="#features">Features</a> &middot;
+  <a href="#quick-start">Quick Start</a> &middot;
+  <a href="#tts-providers">TTS</a> &middot;
+  <a href="#stt-backend-push-to-talk">STT</a> &middot;
+  <a href="#environment-variables">Config</a> &middot;
+  <a href="#ai-setup-guide">AI Guide</a> &middot;
+  <a href="README.ko.md">한국어</a>
+</p>
+
+---
+
+## Install with AI
+
+> **Just paste this to your AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, etc.):**
+>
+> ```
+> Install claw-voice-chat following the guide at:
+> https://github.com/GreenSheep01201/claw-voice-chat
+> ```
+>
+> The AI will read this README and handle everything automatically.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [TTS Providers](#tts-providers)
+  - [Local TTS Server (edge-tts)](#local-tts-server-edge-tts)
+  - [STT Backend (Push-to-Talk)](#stt-backend-push-to-talk)
+- [Usage](#usage)
+- [Remote Access (Mobile)](#remote-access-mobile--other-devices)
+- [Environment Variables](#environment-variables)
+- [AI Setup Guide](#ai-setup-guide)
+  - [Server Endpoints Reference](#server-endpoints-reference)
+  - [Key Files](#key-files)
+  - [WebSocket Protocol](#websocket-protocol-wschat)
+  - [Troubleshooting](#troubleshooting)
+- [License](#license)
+
+---
 
 ## Features
 

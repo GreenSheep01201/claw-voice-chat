@@ -1,8 +1,71 @@
-# Claw-Voice-Chat
+<p align="center">
+  <img src="client/public/claw-icon.svg" width="80" alt="Claw Voice Chat" />
+</p>
 
-[OpenClaw](https://github.com/openclaw/openclaw) 채널을 위한 푸시투톡 음성 채팅 인터페이스.
+<h1 align="center">Claw-Voice-Chat</h1>
 
-Telegram, Discord, Slack 등 OpenClaw 채널에 음성 또는 텍스트로 메시지를 보내고, AI 에이전트의 응답을 실시간 스트리밍으로 받아 TTS로 들을 수 있습니다.
+<p align="center">
+  <strong>OpenClaw 채널을 위한 푸시투톡 음성 채팅</strong><br>
+  Telegram, Discord, Slack 등 <a href="https://github.com/openclaw/openclaw">OpenClaw</a> 채널에 음성 또는 텍스트로 대화하고,<br>
+  AI 에이전트의 응답을 실시간 스트리밍으로 받아 TTS로 들을 수 있습니다.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version" />
+  <img src="https://img.shields.io/badge/node-%3E%3D22-brightgreen" alt="Node.js 22+" />
+  <img src="https://img.shields.io/badge/python-%3E%3D3.10-blue" alt="Python 3.10+" />
+  <img src="https://img.shields.io/badge/license-Apache%202.0-orange" alt="License" />
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey" alt="Platform" />
+  <img src="https://img.shields.io/badge/STT-faster--whisper-blueviolet" alt="STT" />
+  <img src="https://img.shields.io/badge/TTS-Browser%20%7C%20OpenAI%20%7C%20edge--tts-blueviolet" alt="TTS" />
+</p>
+
+<p align="center">
+  <a href="#ai-로-설치하기">AI로 설치하기</a> &middot;
+  <a href="#주요-기능">기능</a> &middot;
+  <a href="#빠른-시작">빠른 시작</a> &middot;
+  <a href="#tts-프로바이더">TTS</a> &middot;
+  <a href="#stt-백엔드-푸시투톡">STT</a> &middot;
+  <a href="#환경-변수">설정</a> &middot;
+  <a href="#ai-설치-가이드">AI 가이드</a> &middot;
+  <a href="README.md">English</a>
+</p>
+
+---
+
+## AI로 설치하기
+
+> **AI 코딩 에이전트 (Claude Code, Codex, Cursor, Gemini CLI 등)에 아래 내용을 붙여넣기 하세요:**
+>
+> ```
+> Install claw-voice-chat following the guide at:
+> https://github.com/GreenSheep01201/claw-voice-chat
+> ```
+>
+> AI가 이 README를 읽고 모든 설치를 자동으로 처리합니다.
+
+---
+
+## 목차
+
+- [주요 기능](#주요-기능)
+- [아키텍처](#아키텍처)
+- [요구사항](#요구사항)
+- [빠른 시작](#빠른-시작)
+- [TTS 프로바이더](#tts-프로바이더)
+  - [로컬 TTS 서버 (edge-tts)](#로컬-tts-서버-edge-tts)
+  - [STT 백엔드 (푸시투톡)](#stt-백엔드-푸시투톡)
+- [사용법](#사용법)
+- [외부 접근 (모바일)](#외부-접근-모바일--다른-기기)
+- [환경 변수](#환경-변수)
+- [AI 설치 가이드](#ai-설치-가이드)
+  - [서버 엔드포인트 참조](#서버-엔드포인트-참조)
+  - [주요 파일](#주요-파일)
+  - [WebSocket 프로토콜](#websocket-프로토콜-wschat)
+  - [문제 해결](#문제-해결)
+- [라이선스](#라이선스)
+
+---
 
 ## 주요 기능
 
