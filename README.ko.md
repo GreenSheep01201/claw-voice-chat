@@ -507,7 +507,116 @@ Invoke-RestMethod 'http://127.0.0.1:8888/bridge/targets?limit=5'
 
 모든 확인이 통과하면 브라우저에서 http://127.0.0.1:8888 을 여세요.
 
-### Step 7: 로컬 TTS 서버 (선택)
+### Step 7: 에이전트 백그라운드 작업 설정 (권장)
+
+이미지 생성, 영상 렌더링 등 오래 걸리는 작업이 음성 채팅 에이전트의 응답을 차단할 수 있습니다.
+이 단계에서는 사용자의 `AGENTS.md`에 백그라운드 작업 정책을 **상단에 추가(덮어쓰기 아님)**하여,
+에이전트가 무거운 작업을 `sessions_spawn` 서브에이전트에 위임하고 응답성을 유지하도록 합니다.
+
+**중요:** 기존 `AGENTS.md`를 **덮어쓰지 않고 상단에 추가**해야 합니다.
+
+```bash
+# macOS / Linux
+AGENTS_FILE="$HOME/.openclaw/workspace/AGENTS.md"
+MARKER="<!-- BEGIN claw-voice-chat background task policy -->"
+
+# 이미 추가되어 있지 않은 경우에만 추가
+if [ ! -f "$AGENTS_FILE" ] || ! grep -q "$MARKER" "$AGENTS_FILE" 2>/dev/null; then
+  mkdir -p "$(dirname "$AGENTS_FILE")"
+  POLICY=$(cat <<'POLICY_EOF'
+<!-- BEGIN claw-voice-chat background task policy -->
+## Background Task Policy (Voice Chat Responsiveness)
+
+> Added by claw-voice-chat setup.
+> Ensures the agent stays responsive during long-running tasks.
+
+When a user requests a task estimated to take **more than 10 seconds** (image generation,
+video rendering, large file processing, web scraping, etc.), **ALWAYS** delegate it to a subagent
+using `sessions_spawn`:
+
+1. **Spawn** the task with a descriptive label and appropriate timeout
+2. **Respond immediately** in the user's language (e.g. "Started! I'll let you know when it's done.")
+3. **Continue handling** new messages while the subagent works in the background
+4. The subagent will **announce results** back to this chat when done
+
+**Always respond in the same language the user is speaking.**
+
+**NEVER block the conversation** with synchronous long-running tool calls.
+If unsure whether a task is long-running, default to spawning a subagent.
+
+---
+
+<!-- END claw-voice-chat background task policy -->
+POLICY_EOF
+)
+  if [ -f "$AGENTS_FILE" ]; then
+    # 기존 파일 상단에 정책 추가
+    EXISTING=$(cat "$AGENTS_FILE")
+    printf '%s\n\n%s' "$POLICY" "$EXISTING" > "$AGENTS_FILE"
+  else
+    echo "$POLICY" > "$AGENTS_FILE"
+  fi
+  echo "OK: 백그라운드 작업 정책이 AGENTS.md에 추가됨"
+else
+  echo "OK: 백그라운드 작업 정책이 이미 AGENTS.md에 존재함"
+fi
+```
+
+```powershell
+# Windows PowerShell
+$agentsFile = "$env:USERPROFILE\.openclaw\workspace\AGENTS.md"
+$marker = "<!-- BEGIN claw-voice-chat background task policy -->"
+
+$exists = $false
+if (Test-Path $agentsFile) {
+  $exists = (Get-Content $agentsFile -Raw) -match [regex]::Escape($marker)
+}
+
+if (-not $exists) {
+  $dir = Split-Path $agentsFile
+  if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+
+  $policy = @"
+<!-- BEGIN claw-voice-chat background task policy -->
+## Background Task Policy (Voice Chat Responsiveness)
+
+> Added by claw-voice-chat setup.
+> Ensures the agent stays responsive during long-running tasks.
+
+When a user requests a task estimated to take **more than 10 seconds** (image generation,
+video rendering, large file processing, web scraping, etc.), **ALWAYS** delegate it to a subagent
+using ``sessions_spawn``:
+
+1. **Spawn** the task with a descriptive label and appropriate timeout
+2. **Respond immediately** in the user's language (e.g. "Started! I'll let you know when it's done.")
+3. **Continue handling** new messages while the subagent works in the background
+4. The subagent will **announce results** back to this chat when done
+
+**Always respond in the same language the user is speaking.**
+
+**NEVER block the conversation** with synchronous long-running tool calls.
+If unsure whether a task is long-running, default to spawning a subagent.
+
+---
+
+<!-- END claw-voice-chat background task policy -->
+"@
+
+  if (Test-Path $agentsFile) {
+    $existing = Get-Content $agentsFile -Raw
+    Set-Content $agentsFile -Value "$policy`n`n$existing"
+  } else {
+    Set-Content $agentsFile -Value $policy
+  }
+  Write-Host "OK: 백그라운드 작업 정책이 AGENTS.md에 추가됨"
+} else {
+  Write-Host "OK: 백그라운드 작업 정책이 이미 AGENTS.md에 존재함"
+}
+```
+
+> 이렇게 하면 AI 에이전트가 무거운 작업을 백그라운드 서브에이전트에 위임하고, 음성 입력에 계속 응답할 수 있습니다.
+
+### Step 8: 로컬 TTS 서버 (선택)
 
 API 키 없이 고품질 TTS — edge-tts 사용:
 
@@ -521,7 +630,7 @@ curl -s http://127.0.0.1:5050/health
 
 UI에서 설정: **Options > TTS/STT > Custom** > URL: `http://localhost:5050/v1/audio/speech`
 
-### Step 8: 모바일 원격 접근 (선택)
+### Step 9: 모바일 원격 접근 (선택)
 
 마이크는 HTTPS가 필요합니다. Tailscale로 자동 HTTPS 인증서를 사용하세요:
 

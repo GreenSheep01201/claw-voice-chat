@@ -507,7 +507,116 @@ Invoke-RestMethod 'http://127.0.0.1:8888/bridge/targets?limit=5'
 
 If all checks pass, open http://127.0.0.1:8888 in a browser.
 
-### Step 7: Local TTS Server (Optional)
+### Step 7: Configure Agent for Background Tasks (Recommended)
+
+Long-running tasks (image generation, video rendering, etc.) can block the voice chat agent from responding.
+This step prepends a background task policy to the user's `AGENTS.md` so the agent delegates heavy work
+to subagents via `sessions_spawn` and stays responsive.
+
+**Important:** This must **prepend** (not overwrite) the existing `AGENTS.md`.
+
+```bash
+# macOS / Linux
+AGENTS_FILE="$HOME/.openclaw/workspace/AGENTS.md"
+MARKER="<!-- BEGIN claw-voice-chat background task policy -->"
+
+# Only add if not already present
+if [ ! -f "$AGENTS_FILE" ] || ! grep -q "$MARKER" "$AGENTS_FILE" 2>/dev/null; then
+  mkdir -p "$(dirname "$AGENTS_FILE")"
+  POLICY=$(cat <<'POLICY_EOF'
+<!-- BEGIN claw-voice-chat background task policy -->
+## Background Task Policy (Voice Chat Responsiveness)
+
+> Added by claw-voice-chat setup.
+> Ensures the agent stays responsive during long-running tasks.
+
+When a user requests a task estimated to take **more than 10 seconds** (image generation,
+video rendering, large file processing, web scraping, etc.), **ALWAYS** delegate it to a subagent
+using `sessions_spawn`:
+
+1. **Spawn** the task with a descriptive label and appropriate timeout
+2. **Respond immediately** in the user's language (e.g. "Started! I'll let you know when it's done.")
+3. **Continue handling** new messages while the subagent works in the background
+4. The subagent will **announce results** back to this chat when done
+
+**Always respond in the same language the user is speaking.**
+
+**NEVER block the conversation** with synchronous long-running tool calls.
+If unsure whether a task is long-running, default to spawning a subagent.
+
+---
+
+<!-- END claw-voice-chat background task policy -->
+POLICY_EOF
+)
+  if [ -f "$AGENTS_FILE" ]; then
+    # Prepend policy to existing file
+    EXISTING=$(cat "$AGENTS_FILE")
+    printf '%s\n\n%s' "$POLICY" "$EXISTING" > "$AGENTS_FILE"
+  else
+    echo "$POLICY" > "$AGENTS_FILE"
+  fi
+  echo "OK: Background task policy added to AGENTS.md"
+else
+  echo "OK: Background task policy already present in AGENTS.md"
+fi
+```
+
+```powershell
+# Windows PowerShell
+$agentsFile = "$env:USERPROFILE\.openclaw\workspace\AGENTS.md"
+$marker = "<!-- BEGIN claw-voice-chat background task policy -->"
+
+$exists = $false
+if (Test-Path $agentsFile) {
+  $exists = (Get-Content $agentsFile -Raw) -match [regex]::Escape($marker)
+}
+
+if (-not $exists) {
+  $dir = Split-Path $agentsFile
+  if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+
+  $policy = @"
+<!-- BEGIN claw-voice-chat background task policy -->
+## Background Task Policy (Voice Chat Responsiveness)
+
+> Added by claw-voice-chat setup.
+> Ensures the agent stays responsive during long-running tasks.
+
+When a user requests a task estimated to take **more than 10 seconds** (image generation,
+video rendering, large file processing, web scraping, etc.), **ALWAYS** delegate it to a subagent
+using ``sessions_spawn``:
+
+1. **Spawn** the task with a descriptive label and appropriate timeout
+2. **Respond immediately** in the user's language (e.g. "Started! I'll let you know when it's done.")
+3. **Continue handling** new messages while the subagent works in the background
+4. The subagent will **announce results** back to this chat when done
+
+**Always respond in the same language the user is speaking.**
+
+**NEVER block the conversation** with synchronous long-running tool calls.
+If unsure whether a task is long-running, default to spawning a subagent.
+
+---
+
+<!-- END claw-voice-chat background task policy -->
+"@
+
+  if (Test-Path $agentsFile) {
+    $existing = Get-Content $agentsFile -Raw
+    Set-Content $agentsFile -Value "$policy`n`n$existing"
+  } else {
+    Set-Content $agentsFile -Value $policy
+  }
+  Write-Host "OK: Background task policy added to AGENTS.md"
+} else {
+  Write-Host "OK: Background task policy already present in AGENTS.md"
+}
+```
+
+> This ensures the AI agent delegates heavy tasks to background subagents and keeps responding to voice input during long operations.
+
+### Step 8: Local TTS Server (Optional)
 
 High-quality TTS without API keys using edge-tts:
 
@@ -521,7 +630,7 @@ curl -s http://127.0.0.1:5050/health
 
 Then configure in the UI: **Options > TTS/STT > Custom** > URL: `http://localhost:5050/v1/audio/speech`
 
-### Step 8: Remote Access for Mobile (Optional)
+### Step 9: Remote Access for Mobile (Optional)
 
 Microphone requires HTTPS. Use Tailscale for automatic HTTPS certificates:
 
