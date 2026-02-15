@@ -244,6 +244,8 @@ export default function App() {
   const bridgeIdRef = useRef<string | null>(null)
   const bridgeEsRef = useRef<EventSource | null>(null)
   const ttsEnabledRef = useRef(ttsEnabled)
+  // Accumulate stt_final texts during push-to-talk; flush as one message on button release.
+  const sttAccumulatorRef = useRef<string[]>([])
 
   async function refreshTargets() {
     try {
@@ -670,8 +672,8 @@ export default function App() {
         const t = (msg as any).text || ''
         setSttPartial('')
         if (t) {
-          // Mirror the finalized STT text into the selected OpenClaw channel session.
-          void injectToTarget(t)
+          // Accumulate during push-to-talk; inject as one message on button release.
+          sttAccumulatorRef.current.push(t)
         }
         break
       }
@@ -901,6 +903,18 @@ export default function App() {
     setMicLevel(0)
 
     sendJson({ type: 'flush' })
+
+    // Flush accumulated STT finals as a single message to the channel.
+    // Use a short delay to let the backend process the flush and emit any remaining stt_final.
+    setTimeout(() => {
+      const parts = sttAccumulatorRef.current
+      sttAccumulatorRef.current = []
+      if (parts.length > 0) {
+        const combined = parts.join(' ')
+        void injectToTarget(combined)
+      }
+    }, 500)
+
     addMeta('Mic streaming stopped')
   }
 
@@ -1074,6 +1088,7 @@ export default function App() {
       if (me.button !== 0) return
     }
     e.preventDefault()
+    sttAccumulatorRef.current = []
     setTalkActive(true)
     void startMic()
   }
