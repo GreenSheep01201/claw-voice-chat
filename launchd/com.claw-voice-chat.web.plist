@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.claw-voice-chat.web</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Adjust this to your actual path -->
+    <key>WorkingDirectory</key>
+    <string>/path/to/claw-voice-chat/server</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>NODE_ENV</key>
+      <string>production</string>
+      <key>PORT</key>
+      <string>8888</string>
+      <key>VCB_BACKEND_HTTP</key>
+      <string>http://127.0.0.1:8766</string>
+
+      <key>OPENCLAW_GATEWAY_URL</key>
+      <string>http://127.0.0.1:18789</string>
+      <key>OPENCLAW_GATEWAY_TOKEN</key>
+      <string>REPLACE_ME_WITH_GATEWAY_TOKEN</string>
+      <key>OPENCLAW_CLI</key>
+      <string>/path/to/openclaw.mjs</string>
+
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <!-- Assumes you've built: npm run build -->
+    <key>ProgramArguments</key>
+    <array>
+      <string>/usr/bin/env</string>
+      <string>node</string>
+      <string>dist/index.js</string>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/claw-voice-chat-web.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/claw-voice-chat-web.err.log</string>
+  </dict>
+</plist>

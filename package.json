@@ -1,0 +1,26 @@
+{
+  "name": "claw-voice-chat",
+  "version": "1.0.0",
+  "description": "Push-to-talk voice chat interface for OpenClaw channels",
+  "author": "GreenSheep01201",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GreenSheep01201/claw-voice-chat.git"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n server,client,stt -c green,magenta,yellow \"npm -C server run dev\" \"npm -C client run dev\" \"cd stt-backend && python -m app.main\"",
+    "build": "npm -C client run build && npm -C server run build",
+    "start": "concurrently -n server,stt -c green,yellow \"cross-env NODE_ENV=production npm -C server run start\" \"cd stt-backend && python -m app.main\"",
+    "start:server": "cross-env NODE_ENV=production npm -C server run start",
+    "stt:install": "pip install -r stt-backend/requirements.txt",
+    "stt:start": "cd stt-backend && python -m app.main",
+    "tts:install": "pip install -r tts-local/requirements.txt",
+    "tts:start": "python tts-local/server.py"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0"
+  }
+}

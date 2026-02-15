@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.claw-voice-chat.backend</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Adjust this to your actual voice-chat-bridge backend path -->
+    <key>WorkingDirectory</key>
+    <string>/path/to/voice-chat-bridge</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>VCB_HOST</key>
+      <string>0.0.0.0</string>
+      <key>VCB_PORT</key>
+      <string>8766</string>
+
+      <!-- Optional: token/auth + other backend envs live in .env -->
+      <!-- <key>VCB_AUTH_TOKEN</key><string>...</string> -->
+
+      <key>PATH</key>
+      <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>-lc</string>
+      <string>./scripts/run_local.sh</string>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/claw-voice-chat-backend.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/claw-voice-chat-backend.err.log</string>
+  </dict>
+</plist>
