@@ -678,11 +678,11 @@ export default function App() {
         break
       }
       case 'user_text': {
+        // In bridge mode, user message is already shown by flush_complete or sendTextInput.
+        if (bridgeIdRef.current) break
         const t = (msg as any).text || ''
         commitAssistantDraft()
         addMessage('user', t)
-        // NOTE: Do NOT mirror here.
-        // We mirror only on stt_final / manual text submit to avoid duplicates.
         break
       }
       case 'assistant_delta':
@@ -708,6 +708,9 @@ export default function App() {
         sttAccumulatorRef.current = []
         if (parts.length > 0) {
           const combined = parts.join(' ')
+          // Show user message in chat UI before sending to channel.
+          commitAssistantDraft()
+          addMessage('user', combined)
           void injectToTarget(combined)
         }
         break
