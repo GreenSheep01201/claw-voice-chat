@@ -13,6 +13,7 @@ from app.llm import OpenClawClient
 from app.stt import StreamingVadStt
 from app.tts import PiperTTS, SentenceChunker
 from app.tts_say import MacSayTTS
+from app.tts_windows import WindowsSapiTTS
 
 
 class VoiceSession:
@@ -42,18 +43,25 @@ class VoiceSession:
         else:
             self._llm = OpenClawClient(model=model, profile=profile, engine=engine)
 
-        # Prefer Piper when truly available; fall back to macOS `say` for local TTS.
+        # Prefer Piper when truly available; fall back to the OS TTS engine.
         # Allow disabling TTS for latency testing.
         mode = (settings.tts_mode or "auto").strip().lower()
         if mode == "off":
             self._tts = None
+        elif mode == "sapi":
+            self._tts = WindowsSapiTTS()
         elif mode == "say":
             self._tts = MacSayTTS()
         elif mode == "piper":
             self._tts = PiperTTS()
         else:
             piper = PiperTTS()
-            self._tts = piper if piper.enabled else MacSayTTS()
+            if piper.enabled:
+                self._tts = piper
+            else:
+                import os
+
+                self._tts = WindowsSapiTTS() if os.name == "nt" else MacSayTTS()
 
         self._history: list[dict[str, str]] = [
             {"role": "system", "content": settings.system_prompt},
@@ -67,10 +75,11 @@ class VoiceSession:
         self._turn_queue: asyncio.Queue[str | None] = asyncio.Queue()
         self._turn_worker: asyncio.Task[None] | None = None
 
+        effective_language = language or (settings.stt_language.strip() or None)
         self._stt = StreamingVadStt(
             on_partial=self._on_stt_partial,
             on_final=self._on_stt_final,
-            language=language,
+            language=effective_language,
             model_size=model_size,
         )
 

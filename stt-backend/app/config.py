@@ -37,10 +37,12 @@ class Settings:
     stt_device: str = os.getenv("STT_DEVICE", "auto")
     stt_compute_type: str = os.getenv("STT_COMPUTE_TYPE", "int8")
     stt_partial_interval_sec: float = float(os.getenv("STT_PARTIAL_INTERVAL_SEC", "1.0"))
+    stt_language: str = os.getenv("VCB_STT_LANGUAGE", "")
 
-    tts_mode: str = os.getenv("TTS_MODE", "auto")  # auto|off|piper|say
+    tts_mode: str = os.getenv("TTS_MODE", "auto")  # auto|off|piper|say|sapi
     piper_bin: str = os.getenv("PIPER_BIN", "piper")
     piper_model: str = os.getenv("PIPER_MODEL", "")
+    sapi_voice_name: str = os.getenv("VCB_SAPI_VOICE_NAME", "")
 
     kanban_inbox_url: str = os.getenv("KANBAN_INBOX_URL", "http://127.0.0.1:8787/api/inbox")
     openclaw_bin: str = os.getenv("OPENCLAW_BIN", "openclaw")
@@ -112,9 +114,11 @@ settings.stt_model_size = os.getenv("STT_MODEL_SIZE", settings.stt_model_size)
 settings.stt_device = os.getenv("STT_DEVICE", settings.stt_device)
 settings.stt_compute_type = os.getenv("STT_COMPUTE_TYPE", settings.stt_compute_type)
 settings.stt_partial_interval_sec = float(os.getenv("STT_PARTIAL_INTERVAL_SEC", str(settings.stt_partial_interval_sec)))
+settings.stt_language = os.getenv("VCB_STT_LANGUAGE", settings.stt_language)
 settings.tts_mode = os.getenv("TTS_MODE", settings.tts_mode)
 settings.piper_bin = os.getenv("PIPER_BIN", settings.piper_bin)
 settings.piper_model = os.getenv("PIPER_MODEL", settings.piper_model)
+settings.sapi_voice_name = os.getenv("VCB_SAPI_VOICE_NAME", settings.sapi_voice_name)
 settings.kanban_inbox_url = os.getenv("KANBAN_INBOX_URL", settings.kanban_inbox_url)
 settings.openclaw_bin = os.getenv("OPENCLAW_BIN", settings.openclaw_bin)
 settings.hook_wake_enabled = os.getenv("HOOK_WAKE_ENABLED", "1") != "0"
