@@ -41,7 +41,8 @@ class VoiceActivityDetector:
                 vad_says_speech = False
 
         # Combine: treat as speech if VAD OR RMS crosses a lower threshold.
-        return vad_says_speech or (rms > 200.0)
+        # Threshold lowered (was 200.0) so laptop mics with AGC/NS still trip the gate.
+        return vad_says_speech or (rms > 80.0)
 
 
 import threading
@@ -113,7 +114,7 @@ class StreamingVadStt:
 
         self._pre_roll: deque[bytes] = deque(maxlen=8)
         # Keep a rolling buffer of recent audio so Flush STT can work even if VAD never triggers.
-        self._recent_frames: deque[bytes] = deque(maxlen=160)  # ~4.8s @ 30ms/frame
+        self._recent_frames: deque[bytes] = deque(maxlen=240)  # ~7.2s @ 30ms/frame
         self._speech_frames: list[bytes] = []
 
         self._speaking = False

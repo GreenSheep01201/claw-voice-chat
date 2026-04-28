@@ -517,6 +517,28 @@ def _safe_json_loads(value: str) -> dict[str, Any] | None:
 
 
 def build_codex_prompt(messages: list[dict[str, str]]) -> str:
+    custom_command = settings.llm_command.strip()
+    if custom_command:
+        # When OPENCLAW_LLM_COMMAND is set (typically pointing to a local LLM
+        # like Ollama), pass the conversation directly without the Codex wrapper.
+        # Local chat models follow a plain "User:/Assistant:" transcript better
+        # than a JSON-wrapped instruction block, and this lets the response
+        # language follow `VCB_SYSTEM_PROMPT` instead of a hard-coded English wrapper.
+        parts: list[str] = []
+        for message in messages:
+            role = str(message.get("role") or "").strip().lower()
+            content = str(message.get("content") or "").strip()
+            if not role or not content:
+                continue
+            if role == "system":
+                parts.append(f"[System instructions]\n{content}")
+            elif role == "user":
+                parts.append(f"User: {content}")
+            elif role == "assistant":
+                parts.append(f"Assistant: {content}")
+        parts.append("Assistant:")
+        return "\n\n".join(parts)
+
     conversation: list[dict[str, str]] = []
     for message in messages:
         role = str(message.get("role") or "").strip().lower()
